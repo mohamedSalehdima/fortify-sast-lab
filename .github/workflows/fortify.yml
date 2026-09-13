@@ -1,0 +1,32 @@
+name: Fortify SAST Scan
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  fortify-sast:
+    runs-on: [ self-hosted, fortify-sast ]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run Fortify ScanCentral SAST scan
+        uses: fortify/github-action@v3
+        env:
+          SSC_URL: ${{ vars.SSC_URL }}
+          SSC_TOKEN: ${{ secrets.SSC_TOKEN }}
+          SC_SAST_TOKEN: ${{ secrets.SC_SAST_TOKEN }}
+          SSC_APPVERSION: ${{ vars.SSC_APPVERSION }}
+          DO_WAIT: true
+          DO_SAST_EXPORT: true
+          SSC_LOGIN_EXTRA_OPTS: '--insecure'
+          SC_SAST_LOGIN_EXTRA_OPTS: '--insecure'
